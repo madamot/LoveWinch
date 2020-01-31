@@ -23,7 +23,7 @@ import {
              }}
            />
            <ScrollView
-             horizontal={true}
+             // horizontal={true}
              showsHorizontalScrollIndicator={false}
            >
              <View style={listStyles.content}>

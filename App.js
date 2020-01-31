@@ -23,7 +23,7 @@ const LATITUDE = 51.064022;
 const LONGITUDE = -1.316288;
 const LATITUDE_DELTA = 0.0322;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
-const TAB_BAR_HEIGHT = 49;
+const TAB_BAR_HEIGHT = 10;
 
     // const locations = [
     //   {
@@ -326,7 +326,7 @@ export default class Home extends Component {
 
         <View style={styles.locations}>
           <List name="Locations" list={tabFilter} handler={this.focusHandler} />
-          <List name="Trails" list={trails} handler={this.focusHandler} />
+          {/* <List name="Trails" list={trails} handler={this.focusHandler} /> */}
         </View>
 
       )
