@@ -47,9 +47,6 @@ import {
 
 
  const listStyles = StyleSheet.create({
-   loconatiner: {
-     backgroundColor: '#fff',
-   },
    contentcontainer: {
      paddingLeft: 14,
      paddingVertical: 4,

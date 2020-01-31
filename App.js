@@ -14,6 +14,7 @@ import MapView, { PROVIDER_GOOGLE, Callout } from 'react-native-maps';
 import * as axios from 'axios';
 import BottomDrawer from 'rn-bottom-drawer';
 import List from './js/Components/List';
+import Detail from './js/Components/Detail';
 
 const { Marker } = MapView;
 const { height, width } = Dimensions.get('screen');
@@ -332,30 +333,9 @@ export default class Home extends Component {
     }
     else {
       return (
-        <ScrollView>
           <View style={styles.focusContainer}>
-            <View style={styles.backButton}>
-              <Button title='X' onPress={this.focusHandler} />
-            </View>
-            <View>
-              <View style={styles.focusData}>
-                <Text style={styles.dataTitle}>{chosenLocation.name}</Text>
-                <Text>{chosenLocation.type}</Text>
-                <TouchableOpacity
-                  style={styles.ARButton}
-                  onPress={() => this.props.navigation.navigate('ARContent', {
-                    location: chosenLocation.name,
-                    otherParam: 'anything you want here',
-                  })
-                  }
-                >
-                  <Text style={styles.buttonTxt}>Go to AR Content</Text>
-                </TouchableOpacity>
-                <Text>{chosenLocation.description}</Text>
-              </View>
-            </View>
+            <Detail location={chosenLocation} handler={this.focusHandler} />
           </View>
-        </ScrollView>
       )
     }
   }
@@ -427,7 +407,7 @@ const styles = StyleSheet.create({
  },
  activeTab: {
    borderBottomColor: 'purple',
-   borderBottomWidth: 5,
+   borderBottomWidth: 10,
  },
  activeTabTitle: {
    color: 'purple',
@@ -457,35 +437,6 @@ const styles = StyleSheet.create({
  focusContainer: {
    flex: 1,
    paddingHorizontal: 14,
- },
- backButton: {
-   alignItems: 'flex-end',
-   justifyContent: 'flex-end',
- },
- focusData: {
-   flex: 1,
-   paddingHorizontal: 14,
- },
- dataTitle: {
-   fontWeight: 'bold',
-   fontSize: 18,
- },
- ARButton: {
-   flex: 1,
-   alignItems: 'center',
-   justifyContent: 'center',
-   marginTop: 15,
-   borderWidth: 0.5,
-   borderColor: '#147EFB',
-   borderRadius: 10,
-   padding: 15,
-   backgroundColor: '#147EFB',
-   color: 'white',
- },
- buttonTxt: {
-   color: 'white',
-   fontSize: 12,
-   fontWeight: 'bold',
  },
 });
 
