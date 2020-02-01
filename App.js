@@ -121,6 +121,7 @@ export default class Home extends Component {
     locations: [],
     trails: trails,
     chosenLocation: "",
+    content: 'loc',
   }
 
 
@@ -168,6 +169,10 @@ export default class Home extends Component {
         this.setState({ active: tabKey, tabFilter: tabFilter });
     }
   }
+
+  handleCon = (loc) => {
+      this.setState({ content: loc });
+    }
 
 
   goToPlace(latitude, longitude) {
@@ -320,11 +325,23 @@ export default class Home extends Component {
   }
 
   renderList() {
-    const { locations, trails, selection, chosenLocation, tabFilter } = this.state;
+    const { locations, trails, selection, chosenLocation, tabFilter, content } = this.state;
     if (!selection) {
       return (
 
         <View style={styles.locations}>
+          <View style={styles.tabs}>
+            <View>
+              <Text onPress={() => this.handleCon('loc')}>
+                Locations
+              </Text>
+            </View>
+            <View>
+              <Text onPress={() => this.handleCon('trails')}>
+                Trails
+              </Text>
+            </View>
+          </View>
           <List name="Locations" list={tabFilter} handler={this.focusHandler} />
           {/* <List name="Trails" list={trails} handler={this.focusHandler} /> */}
         </View>
@@ -340,6 +357,45 @@ export default class Home extends Component {
     }
   }
 
+  renderTrails() {
+    const { locations, trails, selection, chosenLocation, tabFilter, content } = this.state;
+    return (
+      <View style={styles.locations}>
+        <View style={styles.tabs}>
+          <View>
+            <Text onPress={() => this.handleCon('loc')}>
+              Locations
+            </Text>
+          </View>
+          <View>
+            <Text onPress={() => this.handleCon('trails')}>
+              Trails
+            </Text>
+          </View>
+        </View>
+        <List name="Trails" list={trails} handler={this.focusHandler} />
+      </View>
+    )
+  }
+
+  renderDrawer() {
+    const { locations, trails, selection, chosenLocation, tabFilter, content } = this.state;
+    if (content == 'loc') {
+      return (
+        <View>
+          {this.renderList()}
+        </View>
+      )
+    }
+    else if (content == 'trails'){
+      return (
+        <View>
+          {this.renderTrails()}
+        </View>
+      )
+    }
+  }
+
    render() {
      return (
        <SafeAreaView style={styles.container}>
@@ -351,7 +407,7 @@ export default class Home extends Component {
            startUp={false}
          >
            <ScrollView>
-             {this.renderList()}
+             {this.renderDrawer()}
            </ScrollView>
          </BottomDrawer>
        </SafeAreaView>

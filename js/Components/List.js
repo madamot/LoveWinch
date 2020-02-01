@@ -15,13 +15,7 @@ import {
    return (
        <View style={listStyles.loconatiner}>
          <View style={listStyles.contentcontainer}>
-           <Text style={listStyles.locTitle}>{listItem.name}</Text>
-           <View
-             style={{
-               borderBottomColor: 'grey',
-               borderBottomWidth: 0.3,
-             }}
-           />
+           
            <ScrollView
              // horizontal={true}
              showsHorizontalScrollIndicator={false}
@@ -48,7 +42,6 @@ import {
 
  const listStyles = StyleSheet.create({
    contentcontainer: {
-     paddingLeft: 14,
      paddingVertical: 4,
    },
    content: {
