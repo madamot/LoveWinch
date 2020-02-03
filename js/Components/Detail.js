@@ -21,16 +21,28 @@ import {
            <View style={detailStyles.focusData}>
              <Text style={detailStyles.dataTitle}>{detailItem.location.name}</Text>
              <Text>{detailItem.location.type}</Text>
-             <TouchableOpacity
-               style={detailStyles.ARButton}
-               onPress={() => this.props.navigation.navigate('ARContent', {
-                 location: detailItem.location.name,
-                 otherParam: 'anything you want here',
-               })
-               }
-             >
-               <Text style={detailStyles.buttonTxt}>Go to AR Content</Text>
-             </TouchableOpacity>
+             <View style={detailStyles.actions}>
+               <TouchableOpacity
+                 style={detailStyles.directions}
+                 onPress={() => this.props.navigation.navigate('ARContent', {
+                   location: detailItem.location.name,
+                   otherParam: 'anything you want here',
+                 })
+                 }
+               >
+                 <Text style={detailStyles.buttonTxt}>Directions</Text>
+               </TouchableOpacity>
+               <TouchableOpacity
+                 style={detailStyles.ARButton}
+                 onPress={() => this.props.navigation.navigate('ARContent', {
+                   location: detailItem.location.name,
+                   otherParam: 'anything you want here',
+                 })
+                 }
+               >
+                 <Text style={detailStyles.buttonTxt}>Go to AR Content</Text>
+               </TouchableOpacity>
+             </View>
              <Text>{detailItem.location.description}</Text>
            </View>
          </View>
@@ -52,6 +64,13 @@ import {
      fontWeight: 'bold',
      fontSize: 18,
    },
+   actions: {
+     flex: 1,
+     flexDirection: 'row',
+     justifyContent: 'center',
+     alignItems: 'center',
+     paddingBottom: 10,
+   },
    ARButton: {
      flex: 1,
      alignItems: 'center',
@@ -61,6 +80,20 @@ import {
      borderColor: '#147EFB',
      borderRadius: 10,
      padding: 15,
+     marginLeft: 1,
+     backgroundColor: '#147EFB',
+     color: 'white',
+   },
+   directions: {
+     flex: 1,
+     alignItems: 'center',
+     justifyContent: 'center',
+     marginTop: 15,
+     borderWidth: 0.5,
+     borderColor: '#147EFB',
+     borderRadius: 10,
+     padding: 15,
+     marginRight: 1,
      backgroundColor: '#147EFB',
      color: 'white',
    },

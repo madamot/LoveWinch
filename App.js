@@ -23,7 +23,7 @@ const LATITUDE = 51.064022;
 const LONGITUDE = -1.316288;
 const LATITUDE_DELTA = 0.0322;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
-const TAB_BAR_HEIGHT = 10;
+const TAB_BAR_HEIGHT = -20;
 
     // const locations = [
     //   {
@@ -328,16 +328,15 @@ export default class Home extends Component {
     const { locations, trails, selection, chosenLocation, tabFilter, content } = this.state;
     if (!selection) {
       return (
-
         <View style={styles.locations}>
-          <View style={styles.tabs}>
-            <View>
-              <Text onPress={() => this.handleCon('loc')}>
+          <View style={styles.drawerTabs}>
+            <View style={styles.drawerTab, content == 'loc' ? styles.activeDrawerTab : null}>
+              <Text style={styles.drawerTitle} onPress={() => this.handleCon('loc')}>
                 Locations
               </Text>
             </View>
-            <View>
-              <Text onPress={() => this.handleCon('trails')}>
+            <View style={styles.drawerTab, content == 'trails' ? styles.activeDrawerTab : null}>
+              <Text style={styles.drawerTitle} onPress={() => this.handleCon('trails')}>
                 Trails
               </Text>
             </View>
@@ -345,7 +344,6 @@ export default class Home extends Component {
           <List name="Locations" list={tabFilter} handler={this.focusHandler} />
           {/* <List name="Trails" list={trails} handler={this.focusHandler} /> */}
         </View>
-
       )
     }
     else {
@@ -360,26 +358,30 @@ export default class Home extends Component {
   renderTrails() {
     const { locations, trails, selection, chosenLocation, tabFilter, content } = this.state;
     return (
-      <View style={styles.locations}>
-        <View style={styles.tabs}>
-          <View>
-            <Text onPress={() => this.handleCon('loc')}>
+      <View style={styles.trails}>
+        <View style={styles.drawerTabs}>
+          <View style={styles.drawerTab, content == 'loc' ? styles.activeDrawerTab : null}>
+            <Text style={styles.drawerTitle} onPress={() => this.handleCon('loc')}>
               Locations
             </Text>
           </View>
-          <View>
-            <Text onPress={() => this.handleCon('trails')}>
+          <View style={styles.drawerTab, content == 'trails' ? styles.activeDrawerTab : null}>
+            <Text style={styles.drawerTitle} onPress={() => this.handleCon('trails')}>
               Trails
             </Text>
           </View>
         </View>
-        <List name="Trails" list={trails} handler={this.focusHandler} />
+        <View>
+          <View style={styles.trailTitleCon}>
+            <Text style={styles.trailTitle}>Add locations to make your own trail!</Text>
+          </View>
+        </View>
       </View>
     )
   }
 
   renderDrawer() {
-    const { locations, trails, selection, chosenLocation, tabFilter, content } = this.state;
+    const { content } = this.state;
     if (content == 'loc') {
       return (
         <View>
@@ -494,6 +496,37 @@ const styles = StyleSheet.create({
    flex: 1,
    paddingHorizontal: 14,
  },
+ drawerTabs: {
+   flex: 1,
+   flexDirection: 'row',
+   justifyContent: 'center',
+   height: height * 0.05,
+   alignItems: 'center',
+   bottom: -7,
+ },
+ drawerTab: {
+   justifyContent: 'center',
+   paddingHorizontal: 20,
+ },
+ drawerTitle: {
+   marginBottom: 5,
+   paddingHorizontal: 20,
+ },
+ activeDrawerTab: {
+   borderBottomColor: 'grey',
+   borderBottomWidth: 1,
+ },
+ trailTitleCon: {
+   flex: 1,
+   flexDirection: 'row',
+   justifyContent: 'center',
+   alignItems: 'center',
+   padding: 30,
+   paddingHorizontal: 70,
+ },
+ trailTitle: {
+   fontSize: 18
+ }
 });
 
 
