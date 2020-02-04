@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Callout } from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
+import Polyline from '@mapbox/polyline';
 import * as axios from 'axios';
 import BottomDrawer from 'rn-bottom-drawer';
 import List from './js/Components/List';
@@ -113,10 +114,18 @@ export default class Home extends Component {
          longitudeDelta: 0.035,
        }
        this.setState({initalPosition});
+       this.setState({
+         latitude: position.coords.latitude,
+         longitude: position.coords.longitude,
+       });
+
      },
      (error) => this.setState({ error: error.message }),
      { enableHighAccuracy: false, timeout: 200000, maximumAge: 1000 },
    );
+   console.log('first');
+   console.log(this.state.latitude);
+
   }
 
   static navigationOptions = {
@@ -140,6 +149,10 @@ export default class Home extends Component {
     latitude: null,
     longitude: null,
     error: null,
+    coords: [],
+    x: 'false',
+    cordLatitude:51.052840,
+    cordLongitude:-1.336303,
   }
 
     getLocations() {
@@ -206,16 +219,13 @@ export default class Home extends Component {
 
   goBack() {
     this.map.animateCamera({ center: this.state.initalPosition });
-    // this.map.animateCamera({ pitch: this.getRandomFloat(0, 90) });
-  }
+    this.setState({
 
-  backCoordinate() {
-    return {
-      latitude:
-        LATITUDE,
-      longitude:
-        LONGITUDE,
-    };
+      error: null,
+      coords: [],
+      x: 'false',
+    })
+    // this.map.animateCamera({ pitch: this.getRandomFloat(0, 90) });
   }
 
 
@@ -234,6 +244,44 @@ export default class Home extends Component {
     }
   }
 
+  async getDirections(startLoc, destinationLoc) {
+      try {
+          let resp = await fetch(`https://maps.googleapis.com/maps/api/directions/json?origin=${ startLoc }&destination=${ destinationLoc }&key=AIzaSyALxSvI1eqDi0VooB6wRZGG0Du-T8doVnI&mode=walking`)
+          let respJson = await resp.json();
+          let points = Polyline.decode(respJson.routes[0].overview_polyline.points);
+          let coords = points.map((point, index) => {
+              return  {
+                  latitude : point[0],
+                  longitude : point[1]
+              }
+          })
+          this.setState({coords: coords})
+          this.setState({x: "true"})
+          return coords
+          console.log(this.state.coords);
+      } catch(error) {
+        console.log(error);
+           this.setState({x: "error"})
+           return error
+           console.log(error);
+      }
+  }
+
+
+mergeLot = () => {
+  console.log('yes');
+    if (this.state.latitude != null && this.state.longitude!=null)
+     {
+       let concatLot = this.state.latitude +","+this.state.longitude
+       this.setState({
+         concat: concatLot
+       }, () => {
+         this.getDirections(concatLot, "51.052840,-1.336303");
+       });
+console.log('here');
+     }
+
+   }
 
   renderHeader() {
     return (
@@ -335,6 +383,28 @@ export default class Home extends Component {
               </Callout>
             </Marker>
           ))}
+          {/* <MapView.Polyline
+            coordinates={this.state.coords}
+            strokeWidth={2}
+          strokeColor="red"/> */}
+          {!!this.state.latitude && !!this.state.longitude && this.state.x == 'true' &&
+            <MapView.Polyline
+              coordinates={this.state.coords}
+              strokeWidth={2}
+              strokeColor="red"
+            />
+          }
+
+          {!!this.state.latitude && !!this.state.longitude && this.state.x == 'error' &&
+            <MapView.Polyline
+              coordinates={[
+                {latitude: this.state.latitude, longitude: this.state.longitude},
+                {latitude: this.state.cordLatitude, longitude: this.state.cordLongitude},
+              ]}
+              strokeWidth={2}
+              strokeColor="yellow"
+            />
+          }
         </MapView>
       </View>
     )
@@ -358,6 +428,11 @@ export default class Home extends Component {
             </View>
           </View>
           <List name="Locations" list={tabFilter} handler={this.focusHandler} />
+          <TouchableOpacity
+            onPress={() => this.mergeLot()}
+          >
+            <Text>Directions</Text>
+          </TouchableOpacity>
           {/* <List name="Trails" list={trails} handler={this.focusHandler} /> */}
         </View>
       )
@@ -365,7 +440,7 @@ export default class Home extends Component {
     else {
       return (
           <View style={styles.focusContainer}>
-            <Detail location={chosenLocation} handler={this.focusHandler} />
+            <Detail location={chosenLocation} handler={this.focusHandler} directions={this.mergeLot} />
           </View>
       )
     }

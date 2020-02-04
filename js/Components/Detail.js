@@ -24,11 +24,7 @@ import {
              <View style={detailStyles.actions}>
                <TouchableOpacity
                  style={detailStyles.directions}
-                 onPress={() => this.props.navigation.navigate('ARContent', {
-                   location: detailItem.location.name,
-                   otherParam: 'anything you want here',
-                 })
-                 }
+                 onPress={() => detailItem.directions()}
                >
                  <Text style={detailStyles.buttonTxt}>Directions</Text>
                </TouchableOpacity>
