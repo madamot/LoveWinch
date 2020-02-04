@@ -15,7 +15,7 @@ import {
    return (
        <View style={listStyles.loconatiner}>
          <View style={listStyles.contentcontainer}>
-           
+
            <ScrollView
              // horizontal={true}
              showsHorizontalScrollIndicator={false}

@@ -11,6 +11,7 @@ import {
  TouchableOpacity,
 } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Callout } from 'react-native-maps';
+import Geolocation from '@react-native-community/geolocation';
 import * as axios from 'axios';
 import BottomDrawer from 'rn-bottom-drawer';
 import List from './js/Components/List';
@@ -102,6 +103,20 @@ const TAB_BAR_HEIGHT = -20;
 export default class Home extends Component {
   componentDidMount = () => {
     this.getLocations();
+    Geolocation.getCurrentPosition(
+     (position) => {
+       console.log(position);
+       let initalPosition = {
+         latitude: position.coords.latitude,
+         longitude: position.coords.longitude,
+         latitudeDelta: 0.0322,
+         longitudeDelta: 0.035,
+       }
+       this.setState({initalPosition});
+     },
+     (error) => this.setState({ error: error.message }),
+     { enableHighAccuracy: false, timeout: 200000, maximumAge: 1000 },
+   );
   }
 
   static navigationOptions = {
@@ -120,10 +135,12 @@ export default class Home extends Component {
     selection: false,
     locations: [],
     trails: trails,
-    chosenLocation: "",
+    chosenLocation: null,
     content: 'loc',
+    latitude: null,
+    longitude: null,
+    error: null,
   }
-
 
     getLocations() {
     axios
@@ -172,6 +189,7 @@ export default class Home extends Component {
 
   handleCon = (loc) => {
       this.setState({ content: loc });
+
     }
 
 
@@ -187,7 +205,7 @@ export default class Home extends Component {
   }
 
   goBack() {
-    this.map.animateCamera({ center: this.backCoordinate() });
+    this.map.animateCamera({ center: this.state.initalPosition });
     // this.map.animateCamera({ pitch: this.getRandomFloat(0, 90) });
   }
 
@@ -240,7 +258,6 @@ export default class Home extends Component {
 
   renderTabs() {
     const { active } = this.state;
-
     return (
       <View style={styles.tabs}>
         <View style={[styles.tab, active === 'all' ? styles.activeTab : null ]}>
@@ -295,13 +312,12 @@ export default class Home extends Component {
       <View style={styles.map}>
         <MapView
           provider={PROVIDER_GOOGLE}
-          ref={ref => {
-            this.map = ref;
-          }}
+          ref={map => this.map = map}
           style={{flex: 1, height: height, width,}}
           showsMyLocationButton={true}
-          initialRegion={this.state.region}
-          onRegionChange={region => this.onRegionChange(region)}
+          showsUserLocation={true}
+          initialRegion={this.state.initalPosition}
+          // onRegionChange={region => this.onRegionChange(region)}
         >
           {this.state.tabFilter.map(marker => (
             <Marker
@@ -375,6 +391,11 @@ export default class Home extends Component {
           <View style={styles.trailTitleCon}>
             <Text style={styles.trailTitle}>Add locations to make your own trail!</Text>
           </View>
+          <View>
+            <Text> {this.state.latitude} </Text>
+            <Text> {this.state.longitude} </Text>
+            <Text> {this.state.error} </Text>
+          </View>
         </View>
       </View>
     )
@@ -407,6 +428,8 @@ export default class Home extends Component {
            containerHeight={300}
            offset={TAB_BAR_HEIGHT}
            startUp={false}
+           shadow={true}
+           ref={drawer => this.drawer = drawer}
          >
            <ScrollView>
              {this.renderDrawer()}
