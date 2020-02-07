@@ -10,6 +10,9 @@ import {
   Button,
   TouchableOpacity,
  } from 'react-native';
+ import { withNavigation } from 'react-navigation';
+ import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
  const Detail = detailItem => {
    return (
@@ -30,11 +33,7 @@ import {
                </TouchableOpacity>
                <TouchableOpacity
                  style={detailStyles.ARButton}
-                 onPress={() => this.props.navigation.navigate('ARContent', {
-                   location: detailItem.location.name,
-                   otherParam: 'anything you want here',
-                 })
-                 }
+                 onPress={() => detailItem.nav()}
                >
                  <Text style={detailStyles.buttonTxt}>Go to AR Content</Text>
                </TouchableOpacity>

@@ -5,11 +5,11 @@ import {
   Button,
  } from 'react-native';
 
-export default class Settings extends Component {
+export default class Login extends Component {
   render() {
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <Text>Settings</Text>
+        <Text>Login</Text>
       </View>
     );
   }

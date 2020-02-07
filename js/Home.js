@@ -9,6 +9,8 @@ import {
  Dimensions,
  Button,
  TouchableOpacity,
+ Animated,
+ TouchableWithoutFeedback
 } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Callout } from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
@@ -128,7 +130,7 @@ export default class Home extends Component {
   }
 
   static navigationOptions = {
-    header: null,
+    headerShown: false,
   };
 
   state = {
@@ -154,7 +156,19 @@ export default class Home extends Component {
     desLongitude: null,
     cordLatitude:51.060891,
     cordLongitude:-1.313165,
+    animation: new Animated.Value(0)
   }
+
+    toggleOpen = () => {
+      const toValue = this._open ? 0 : 1;
+
+      Animated.timing(this.state.animation, {
+        toValue,
+        duration: 200
+      }).start();
+
+      this._open = !this._open;
+    }
 
     getLocations() {
     axios
@@ -292,16 +306,8 @@ mergeLot = () => {
     return (
       <View style={styles.headerContainer}>
         <View style={styles.header}>
-          <View style={{flex: 2, flexDirection: 'row', justifyContent: 'space-between'}}>
-            <View style={styles.login}>
-              <Text style={{fontSize: 18, color: 'purple'}}>Login</Text>
-            </View>
-            <View style={styles.settings}>
-              <Button
-                title="Settings"
-                onPress={() => this.props.navigation.navigate('Settings')}
-              />
-            </View>
+          <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
+            <Text>L&#x2764;veWinch</Text>
           </View>
         </View>
         {this.renderTabs()}
@@ -351,6 +357,40 @@ mergeLot = () => {
   }
 
   renderMap() {
+
+    const loginStyle = {
+      transform: [{
+        scale: this.state.animation
+      }, {
+        translateY: this.state.animation.interpolate({
+          inputRange: [0,1],
+          outputRange: [0, 70]
+        })
+      }]
+    }
+
+    const settingsStyle = {
+      transform: [{
+        scale: this.state.animation
+      }, {
+        translateY: this.state.animation.interpolate({
+          inputRange: [0,1],
+          outputRange: [0, 140]
+        })
+      }]
+    }
+
+    const achievementsStyle = {
+      transform: [{
+        scale: this.state.animation
+      }, {
+        translateY: this.state.animation.interpolate({
+          inputRange: [0,1],
+          outputRange: [0, 210]
+        })
+      }]
+    }
+
     const winchMarker = ({type}) => (
       <View style={[styles.marker, styles['${type}Marker']]}>
         {type === 'Attraction' ?
@@ -372,12 +412,13 @@ mergeLot = () => {
           initialRegion={this.state.initalPosition}
           // onRegionChange={region => this.onRegionChange(region)}
         >
+
           {this.state.tabFilter.map(marker => (
             <Marker
               key={marker.id}
               coordinate={{
-                latitude: marker.latitude,
-                longitude: marker.longitude
+                  latitude: marker.latitude,
+                  longitude: marker.longitude
               }}
             >
               {winchMarker(marker)}
@@ -388,10 +429,12 @@ mergeLot = () => {
               </Callout>
             </Marker>
           ))}
+
           {/* <MapView.Polyline
             coordinates={this.state.coords}
             strokeWidth={2}
           strokeColor="red"/> */}
+
           {!!this.state.latitude && !!this.state.longitude && this.state.x == 'true' &&
             <MapView.Polyline
               coordinates={this.state.coords}
@@ -399,6 +442,7 @@ mergeLot = () => {
               strokeColor="red"
             />
           }
+
 
           {/* {!!this.state.latitude && !!this.state.longitude && this.state.x == 'error' &&
             <MapView.Polyline
@@ -411,6 +455,29 @@ mergeLot = () => {
             />
           } */}
         </MapView>
+        <TouchableWithoutFeedback onPress={() => this.props.navigation.navigate('Achievements')}>
+          <Animated.View style={[styles.button, styles.other, achievementsStyle]}>
+            <Text>Achievements</Text>
+          </Animated.View>
+        </TouchableWithoutFeedback>
+
+        <TouchableWithoutFeedback onPress={() => this.props.navigation.navigate('Settings')}>
+          <Animated.View style={[styles.button, styles.other, settingsStyle]}>
+            <Text>Settings</Text>
+          </Animated.View>
+        </TouchableWithoutFeedback>
+
+        <TouchableWithoutFeedback onPress={() => this.props.navigation.navigate('Login')}>
+          <Animated.View style={[styles.button, styles.other, loginStyle]}>
+            <Text>Login</Text>
+          </Animated.View>
+        </TouchableWithoutFeedback>
+
+        <TouchableWithoutFeedback onPress={this.toggleOpen}>
+          <View style={[styles.button, styles.menu]}>
+            <Text stlye={styles.menuText}>></Text>
+          </View>
+        </TouchableWithoutFeedback>
       </View>
     )
   }
@@ -433,11 +500,7 @@ mergeLot = () => {
             </View>
           </View>
           <List name="Locations" list={tabFilter} handler={this.focusHandler} />
-          <TouchableOpacity
-            onPress={() => this.mergeLot()}
-          >
-            <Text>Directions</Text>
-          </TouchableOpacity>
+
           {/* <List name="Trails" list={trails} handler={this.focusHandler} /> */}
         </View>
       )
@@ -445,7 +508,10 @@ mergeLot = () => {
     else {
       return (
           <View style={styles.focusContainer}>
-            <Detail location={chosenLocation} handler={this.focusHandler} directions={this.mergeLot} />
+            <Detail location={chosenLocation} handler={this.focusHandler} directions={this.mergeLot} nav={() => this.props.navigation.navigate('ARContent', {
+              location: chosenLocation.name,
+              otherParam: 'anything you want here',
+            })} />
           </View>
       )
     }
@@ -470,11 +536,6 @@ mergeLot = () => {
         <View>
           <View style={styles.trailTitleCon}>
             <Text style={styles.trailTitle}>Add locations to make your own trail!</Text>
-          </View>
-          <View>
-            <Text> {this.state.latitude} </Text>
-            <Text> {this.state.longitude} </Text>
-            <Text> {this.state.error} </Text>
           </View>
         </View>
       </View>
@@ -629,199 +690,28 @@ const styles = StyleSheet.create({
  },
  trailTitle: {
    fontSize: 18
+ },
+ button: {
+   width: 60,
+   height: 60,
+   alignItems: "center",
+   justifyContent: "center",
+   shadowColor: "#333",
+   shadowOpacity: .1,
+   shadowOffset: { x: 2, y: 0 },
+   shadowRadius: 2,
+   borderRadius: 30,
+   position: "absolute",
+   top: 15,
+   left: 20,
+ },
+ menu: {
+   backgroundColor: "purple",
+ },
+ other: {
+   backgroundColor: "#FFF",
+ },
+ menuText: {
+   color: '#FFF',
  }
 });
-
-
-// import React, { Component } from 'react';
-// import {
-//   AppRegistry,
-//   Text,
-//   View,
-//   StyleSheet,
-//   PixelRatio,
-//   TouchableHighlight,
-// } from 'react-native';
-//
-// import {
-//   ViroVRSceneNavigator,
-//   ViroARSceneNavigator
-// } from 'react-viro';
-//
-// import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
-//
-//
-// /*
-//  TODO: Insert your API key below
-//  */
-// var sharedProps = {
-//   apiKey:"1AB415AE-A2C5-419E-B175-36434EF75A67",
-// }
-//
-// // Sets the default scene you want for AR and VR
-// var InitialARScene = require('./js/HelloWorldSceneAR');
-// var InitialVRScene = require('./js/HelloWorldScene');
-//
-// var UNSET = "UNSET";
-// var VR_NAVIGATOR_TYPE = "VR";
-// var AR_NAVIGATOR_TYPE = "AR";
-//
-// // This determines which type of experience to launch in, or UNSET, if the user should
-// // be presented with a choice of AR or VR. By default, we offer the user a choice.
-// var defaultNavigatorType = UNSET;
-//
-// export default class ViroSample extends Component {
-//   constructor() {
-//     super();
-//
-//     this.state = {
-//       navigatorType : defaultNavigatorType,
-//       sharedProps : sharedProps
-//     }
-//     this._getExperienceSelector = this._getExperienceSelector.bind(this);
-//     this._getARNavigator = this._getARNavigator.bind(this);
-//     this._getVRNavigator = this._getVRNavigator.bind(this);
-//     this._getExperienceButtonOnPress = this._getExperienceButtonOnPress.bind(this);
-//     this._exitViro = this._exitViro.bind(this);
-//   }
-//
-//   // Replace this function with the contents of _getVRNavigator() or _getARNavigator()
-//   // if you are building a specific type of experience.
-//   render() {
-//     if (this.state.navigatorType == UNSET) {
-//       return this._getExperienceSelector();
-//     } else if (this.state.navigatorType == VR_NAVIGATOR_TYPE) {
-//       return this._getVRNavigator();
-//     } else if (this.state.navigatorType == AR_NAVIGATOR_TYPE) {
-//       return this._getARNavigator();
-//     }
-//
-//   }
-//
-//   // Presents the user with a choice of an AR or VR experience
-//   _getExperienceSelector() {
-//     return (
-//       <View style={localStyles.outer} >
-//         <View style={localStyles.inner} >
-//
-//           <Text style={localStyles.titleText}>
-//             Choose your desired experience:
-//           </Text>
-//
-//           <TouchableHighlight style={localStyles.buttons}
-//             onPress={this._getExperienceButtonOnPress(AR_NAVIGATOR_TYPE)}
-//             underlayColor={'#68a0ff'} >
-//
-//             <Text style={localStyles.buttonText}>AR</Text>
-//           </TouchableHighlight>
-//
-//           <TouchableHighlight style={localStyles.buttons}
-//             onPress={this._getExperienceButtonOnPress(VR_NAVIGATOR_TYPE)}
-//             underlayColor={'#68a0ff'} >
-//
-//             <Text style={localStyles.buttonText}>VR</Text>
-//           </TouchableHighlight>
-//         </View>
-//         <View style={{ flex: 1 }}>
-//           <MapView
-//             provider={PROVIDER_GOOGLE}
-//             style={{ flex: 1 }}
-//             initialRegion={{
-//               latitude: 37.78825,
-//               longitude: -122.4324,
-//               latitudeDelta: 0.0922,
-//               longitudeDelta: 0.0421
-//             }}></MapView>
-//         </View>
-//       </View>
-//     );
-//   }
-//
-//   // Returns the ViroARSceneNavigator which will start the AR experience
-//   _getARNavigator() {
-//     return (
-//       <ViroARSceneNavigator {...this.state.sharedProps}
-//         initialScene={{scene: InitialARScene}} />
-//     );
-//   }
-//
-//   // Returns the ViroSceneNavigator which will start the VR experience
-//   _getVRNavigator() {
-//     return (
-//       <ViroVRSceneNavigator {...this.state.sharedProps}
-//         initialScene={{scene: InitialVRScene}} onExitViro={this._exitViro}/>
-//     );
-//   }
-//
-//   // This function returns an anonymous/lambda function to be used
-//   // by the experience selector buttons
-//   _getExperienceButtonOnPress(navigatorType) {
-//     return () => {
-//       this.setState({
-//         navigatorType : navigatorType
-//       })
-//     }
-//   }
-//
-//   // This function "exits" Viro by setting the navigatorType to UNSET.
-//   _exitViro() {
-//     this.setState({
-//       navigatorType : UNSET
-//     })
-//   }
-// }
-//
-// var localStyles = StyleSheet.create({
-//   viroContainer :{
-//   },
-//   outer : {
-//     flex : 1,
-//     flexDirection: 'row',
-//     alignItems:'center',
-//     backgroundColor: "black",
-//   },
-//   inner: {
-//     flex : 1,
-//     flexDirection: 'column',
-//     alignItems:'center',
-//     backgroundColor: "black",
-//   },
-//   titleText: {
-//     paddingTop: 30,
-//     paddingBottom: 20,
-//     color:'#fff',
-//     textAlign:'center',
-//     fontSize : 25
-//   },
-//   buttonText: {
-//     color:'#fff',
-//     textAlign:'center',
-//     fontSize : 20
-//   },
-//   buttons : {
-//     height: 80,
-//     width: 150,
-//     paddingTop:20,
-//     paddingBottom:20,
-//     marginTop: 10,
-//     marginBottom: 10,
-//     backgroundColor:'#68a0cf',
-//     borderRadius: 10,
-//     borderWidth: 1,
-//     borderColor: '#fff',
-//   },
-//   exitButton : {
-//     height: 50,
-//     width: 100,
-//     paddingTop:10,
-//     paddingBottom:10,
-//     marginTop: 10,
-//     marginBottom: 10,
-//     backgroundColor:'#68a0cf',
-//     borderRadius: 10,
-//     borderWidth: 1,
-//     borderColor: '#fff',
-//   }
-// });
-//
-// module.exports = ViroSample
