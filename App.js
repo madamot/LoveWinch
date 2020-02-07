@@ -15,6 +15,7 @@ import Geolocation from '@react-native-community/geolocation';
 import Polyline from '@mapbox/polyline';
 import * as axios from 'axios';
 import BottomDrawer from 'rn-bottom-drawer';
+
 import List from './js/Components/List';
 import Detail from './js/Components/Detail';
 
@@ -106,7 +107,7 @@ export default class Home extends Component {
     this.getLocations();
     Geolocation.getCurrentPosition(
      (position) => {
-       console.log(position);
+       // console.log(position);
        let initalPosition = {
          latitude: position.coords.latitude,
          longitude: position.coords.longitude,
@@ -123,9 +124,7 @@ export default class Home extends Component {
      (error) => this.setState({ error: error.message }),
      { enableHighAccuracy: false, timeout: 200000, maximumAge: 1000 },
    );
-   console.log('first');
-   console.log(this.state.latitude);
-
+   // console.log(this.state.latitude);
   }
 
   static navigationOptions = {
@@ -151,8 +150,10 @@ export default class Home extends Component {
     error: null,
     coords: [],
     x: 'false',
-    cordLatitude:51.052840,
-    cordLongitude:-1.336303,
+    desLatitude: null,
+    desLongitude: null,
+    cordLatitude:51.060891,
+    cordLongitude:-1.313165,
   }
 
     getLocations() {
@@ -161,10 +162,10 @@ export default class Home extends Component {
       .then(res => {
         this.setState({ locations: res.data })
         this.setState({ tabFilter: res.data })
-        console.log(this.state.locations);
+        // console.log(this.state.locations);
       })
       .catch(err => {
-        console.log("oh no");
+        console.log("error getting backend api");
       });
 
   }
@@ -189,12 +190,10 @@ export default class Home extends Component {
       this.setState({ active: tabKey });
     }
     else if (tabKey == 'Attraction') {
-
       tabFilter = this.state.locations.filter(locations => locations.type === tabKey);
       this.setState({ active: tabKey, tabFilter: tabFilter });
     }
     else if (tabKey == 'Commercial') {
-
       tabFilter = this.state.locations.filter(locations => locations.type === tabKey);
         this.setState({ active: tabKey, tabFilter: tabFilter });
     }
@@ -234,8 +233,13 @@ export default class Home extends Component {
       this.setState({ selection: true });
       this.setState({ chosenLocation: place });
       console.log(this.state.chosenLocation);
+      this.setState({
+        desLatitude: place.latitude,
+        desLongitude: place.longitude,
+      })
+      console.log(this.state.desLatitude);
+      console.log(this.state.desLongitude);
       if (this.state.chosenLocation) {
-
         this.goToPlace(this.state.chosenLocation.latitude, this.state.chosenLocation.longitude);
       }
     } else {
@@ -260,28 +264,29 @@ export default class Home extends Component {
           return coords
           console.log(this.state.coords);
       } catch(error) {
-        console.log(error);
-           this.setState({x: "error"})
-           return error
-           console.log(error);
+         console.log(error);
+         this.setState({x: "error"})
+         return error
       }
   }
 
 
 mergeLot = () => {
-  console.log('yes');
-    if (this.state.latitude != null && this.state.longitude!=null)
+    if (this.state.latitude != null && this.state.longitude!=null && this.state.desLongitude != null && this.state.desLatitude != null)
      {
        let concatLot = this.state.latitude +","+this.state.longitude
+       let concatdesLot = this.state.desLatitude +","+this.state.desLongitude
        this.setState({
-         concat: concatLot
+         concat: concatLot,
+         concatdes: concatdesLot
        }, () => {
-         this.getDirections(concatLot, "51.052840,-1.336303");
+         this.getDirections(concatLot, concatdesLot);
        });
-console.log('here');
+       console.log(concatLot);
+       console.log(concatdesLot);
      }
-
    }
+   "51.060891,-1.313165"
 
   renderHeader() {
     return (
@@ -395,16 +400,16 @@ console.log('here');
             />
           }
 
-          {!!this.state.latitude && !!this.state.longitude && this.state.x == 'error' &&
+          {/* {!!this.state.latitude && !!this.state.longitude && this.state.x == 'error' &&
             <MapView.Polyline
               coordinates={[
-                {latitude: this.state.latitude, longitude: this.state.longitude},
-                {latitude: this.state.cordLatitude, longitude: this.state.cordLongitude},
+            {latitude: this.state.latitude, longitude: this.state.longitude},
+            {latitude: this.state.cordLatitude, longitude: this.state.cordLongitude},
               ]}
               strokeWidth={2}
               strokeColor="yellow"
             />
-          }
+          } */}
         </MapView>
       </View>
     )
