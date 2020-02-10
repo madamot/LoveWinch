@@ -628,11 +628,11 @@ const styles = StyleSheet.create({
    marginBottom: 10,
  },
  activeTab: {
-   borderBottomColor: 'purple',
+   borderBottomColor: '#674b99',
    borderBottomWidth: 10,
  },
  activeTabTitle: {
-   color: 'purple',
+   color: '#674b99',
  },
  map: {
    flex: 1,
@@ -706,12 +706,13 @@ const styles = StyleSheet.create({
    left: 20,
  },
  menu: {
-   backgroundColor: "purple",
+   backgroundColor: "#674b99",
  },
  other: {
    backgroundColor: "#FFF",
  },
  menuText: {
-   color: '#FFF',
+   color: "#FFF",
+   fontWeight: 'bold',
  }
 });
