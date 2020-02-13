@@ -6,6 +6,7 @@ import Settings from '../js/Settings';
 import ARContent from '../js/ARContent';
 import Achievements from '../js/Achievements';
 import Login from '../js/Components/Login/Login';
+import Signup from '../js/Components/Signup/Signup';
 
 export default createStackNavigator({
   Home: Home,
@@ -13,4 +14,5 @@ export default createStackNavigator({
   ARContent: ARContent,
   Achievements: Achievements,
   Login: Login,
+  Signup: Signup,
 });

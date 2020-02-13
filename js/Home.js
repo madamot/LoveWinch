@@ -10,7 +10,9 @@ import {
  Button,
  TouchableOpacity,
  Animated,
- TouchableWithoutFeedback
+ TouchableWithoutFeedback,
+ AsyncStorage,
+ AlertIOS
 } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Callout } from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
@@ -159,28 +161,28 @@ export default class Home extends Component {
     animation: new Animated.Value(0)
   }
 
-    toggleOpen = () => {
-      const toValue = this._open ? 0 : 1;
+  toggleOpen = () => {
+    const toValue = this._open ? 0 : 1;
 
-      Animated.timing(this.state.animation, {
-        toValue,
-        duration: 200
-      }).start();
+    Animated.timing(this.state.animation, {
+      toValue,
+      duration: 200
+    }).start();
 
-      this._open = !this._open;
-    }
+    this._open = !this._open;
+  }
 
-    getLocations() {
-    axios
-      .get('http://127.0.0.1:8000/api/v1/')
-      .then(res => {
-        this.setState({ locations: res.data })
-        this.setState({ tabFilter: res.data })
-        // console.log(this.state.locations);
-      })
-      .catch(err => {
-        console.log("error getting backend api");
-      });
+  getLocations() {
+  axios
+    .get('http://127.0.0.1:8000/api/v1/')
+    .then(res => {
+      this.setState({ locations: res.data })
+      this.setState({ tabFilter: res.data })
+      // console.log(this.state.locations);
+    })
+    .catch(err => {
+      console.log("error getting backend api");
+    });
 
   }
 
@@ -457,19 +459,19 @@ mergeLot = () => {
         </MapView>
         <TouchableWithoutFeedback onPress={() => this.props.navigation.navigate('Achievements')}>
           <Animated.View style={[styles.button, styles.other, achievementsStyle]}>
-            <Text>Achievements</Text>
+            <Text>&#x1F3C6;</Text>
           </Animated.View>
         </TouchableWithoutFeedback>
 
         <TouchableWithoutFeedback onPress={() => this.props.navigation.navigate('Settings')}>
           <Animated.View style={[styles.button, styles.other, settingsStyle]}>
-            <Text>Settings</Text>
+            <Text>&#x2699;</Text>
           </Animated.View>
         </TouchableWithoutFeedback>
 
         <TouchableWithoutFeedback onPress={() => this.props.navigation.navigate('Login')}>
           <Animated.View style={[styles.button, styles.other, loginStyle]}>
-            <Text>Login</Text>
+            <Text>&#x1f511;</Text>
           </Animated.View>
         </TouchableWithoutFeedback>
 
