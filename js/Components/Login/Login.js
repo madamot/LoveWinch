@@ -6,6 +6,8 @@ import {
  Image,
  KeyboardAvoidingView,
  TouchableOpacity,
+ AsyncStorage,
+ AlertIOS
 } from 'react-native';
 import LoginForm from './LoginForm';
 

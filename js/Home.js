@@ -11,7 +11,6 @@ import {
  TouchableOpacity,
  Animated,
  TouchableWithoutFeedback,
- AsyncStorage,
  AlertIOS
 } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Callout } from 'react-native-maps';
@@ -19,6 +18,7 @@ import Geolocation from '@react-native-community/geolocation';
 import Polyline from '@mapbox/polyline';
 import * as axios from 'axios';
 import BottomDrawer from 'rn-bottom-drawer';
+import AsyncStorage from '@react-native-community/async-storage';
 
 import List from './Components/List';
 import Detail from './Components/Detail';
@@ -109,6 +109,7 @@ const TAB_BAR_HEIGHT = -20;
 export default class Home extends Component {
   componentDidMount = () => {
     this.getLocations();
+    this.getData();
     Geolocation.getCurrentPosition(
      (position) => {
        // console.log(position);
@@ -168,7 +169,6 @@ export default class Home extends Component {
       toValue,
       duration: 200
     }).start();
-
     this._open = !this._open;
   }
 
@@ -183,8 +183,18 @@ export default class Home extends Component {
     .catch(err => {
       console.log("error getting backend api");
     });
-
   }
+
+  getData = async () => {
+  try {
+    const value = await AsyncStorage.getItem('key')
+    if(value !== null) {
+      console.log('yay');
+    }
+  } catch(e) {
+    // error reading value
+  }
+}
 
 
   onRegionChange(region) {

@@ -4,36 +4,50 @@ import {
   Text,
   Button,
  } from 'react-native';
+ import AsyncStorage from '@react-native-community/async-storage';
+
 
 export default class Achievements extends Component {
 
-  componentDidMount = () => {
-    this.checkUserSignedIn()
+  state = {
+    loggedin: false,
+    name: null,
   }
 
 
-  checkUserSignedIn = async() => {
-    let context = this;
-    try {
-       let value = await AsyncStorage.getItem('key');
-       if (value != null){
-          AlertIOS.alert('Sync Complete', 'All your data are belong to us.');
-          console.log('yay');
-       }
-       else {
-          AlertIOS.alert('Sync fail', 'All your data not belong to us.');
-          console.log('oh');
-      }
-    } catch (error) {
-      // Error retrieving data
-      console.log('fail');
+  componentDidMount = () => {
+    this.getData();
+    console.log('reloaded');
+  }
+
+
+  getData = async () => {
+  try {
+    const name = await AsyncStorage.getItem('name')
+    if(name !== null) {
+      this.setState({loggedin: true, name: name})
     }
+  } catch(e) {
+    console.log('oh');
+  }
 }
+
   render() {
-    return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <Text>Achievements</Text>
-      </View>
-    );
+    const { loggedin } = this.state;
+    if (loggedin == true) {
+      return (
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <Text>Hello {this.state.name}</Text>
+          <Text>Logged in</Text>
+        </View>
+      );
+    }
+    else {
+      return (
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <Text>Not logged in</Text>
+        </View>
+      );
+    }
   }
 }

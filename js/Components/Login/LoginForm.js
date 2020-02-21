@@ -5,10 +5,10 @@ import {
  TextInput,
  Text,
  TouchableOpacity,
- AsyncStorage,
  AlertIOS
 } from 'react-native';
 import * as axios from 'axios';
+import AsyncStorage from '@react-native-community/async-storage';
 
 // import Signup from '../Signup/Signup';
 
@@ -17,9 +17,8 @@ export default class LoginForm extends Component {
 
 
   state = {
-    enteredUser: '',
-    enteredEmail: '',
-    enteredPass: '',
+    username: null,
+    password: null,
   }
 
 // usernameInputHandler = (enteredUser) => {
@@ -33,25 +32,50 @@ export default class LoginForm extends Component {
 // passwordInputHandler = (enteredPass) => {
 //   this.setState({ enteredPass })
 // }
+
+// const data = { 'username': 'testuser3', 'email': 'testuser3@email.com', 'password1': 'testpass123', 'password2': 'testpass123' };
+
+loginHandler = async() => {
+
+  fetch('http://127.0.0.1:8000/api/v1/rest-auth/login/', {
+    method: 'POST', // or 'PUT'
+    headers: {
+      'Content-Type': 'application/json',
+      // 'Authorization': '74a5dc0339dec9ccd96fcf41a62d35fb62e039b8',
+    },
+    body: JSON.stringify({ 'username': this.state.username, 'password': this.state.password }),
+  })
+  .then((response) => response.json())
+  .then((data) => {
+    this.storeToken(data);
+    console.log('Success:', data);
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+  });
+}
+
+storeToken = async (data) => {
+  console.log(data.key);
+  const key = JSON.stringify(data.key);
+  try {
+    await AsyncStorage.setItem(this.state.username, key);
+    await AsyncStorage.setItem('name', this.state.username);
+    // this.importData();
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// importData = async () => {
+//   try {
+//     const keys = await AsyncStorage.getAllKeys();
+//     const result = await AsyncStorage.multiGet(keys);
 //
-// loginHandler() {
-//   const data = { 'username': 'testuser3', 'email': 'testuser3@email.com', 'password1': 'testpass123', 'password2': 'testpass123' };
-//
-//   fetch('http://127.0.0.1:8000/api/v1/rest-auth/registration/', {
-//     method: 'POST', // or 'PUT'
-//     headers: {
-//       'Content-Type': 'application/json',
-//       // 'Authorization': '74a5dc0339dec9ccd96fcf41a62d35fb62e039b8',
-//     },
-//     body: JSON.stringify(data),
-//   })
-//   .then((response) => response.json())
-//   .then((data) => {
-//     console.log('Success:', data);
-//   })
-//   .catch((error) => {
-//     console.error('Error:', error);
-//   });
+//     return result.map(req => JSON.parse(req)).forEach(console.log);
+//   } catch (error) {
+//     console.error(error)
+//   }
 // }
 
 
@@ -90,14 +114,7 @@ export default class LoginForm extends Component {
               style={styles.input}
               placeholder="Username"
               placeholderTextColor="rgba(225,225,225,0.7)"
-              onChangeText={this.usernameInputHandler}
-              autoCapitalize = 'none'
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Email"
-              placeholderTextColor="rgba(225,225,225,0.7)"
-              onChangeText={this.emailInputHandler}
+              onChangeText={(username) => this.setState({username})}
               autoCapitalize = 'none'
             />
             <TextInput
@@ -105,7 +122,7 @@ export default class LoginForm extends Component {
               placeholder="Password"
               placeholderTextColor="rgba(225,225,225,0.7)"
               secureTextEntry
-              onChangeText={this.passwordInputHandler}
+              onChangeText={(password) => this.setState({password})}
               autoCapitalize = 'none'
             />
           </View>

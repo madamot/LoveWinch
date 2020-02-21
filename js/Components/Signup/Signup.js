@@ -7,10 +7,9 @@ import {
  TouchableOpacity,
  TextInput,
  Text,
- AsyncStorage,
  AlertIOS
 } from 'react-native';
-
+import AsyncStorage from '@react-native-community/async-storage';
 
 
 export default class Signup extends Component {
@@ -63,9 +62,9 @@ signupHandler = async() => {
   })
   .then((response) => response.json())
   .then((data) => {
-    this.storeToken(data);
+    // this.storeToken(data);
     console.log('Success:', data);
-    this.props.navigation.navigate('Home');
+    this.props.navigation.navigate('Login');
   })
   .catch((error) => {
     console.error('Error:', error);
@@ -92,27 +91,27 @@ signupHandler = async() => {
 // }
 
 
-storeToken = async (data) => {
-  console.log(data.key);
-  const key = JSON.stringify(data.key);
-  try {
-    await AsyncStorage.setItem('Key', key);
-    this.importData();
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-importData = async () => {
-  try {
-    const keys = await AsyncStorage.getAllKeys();
-    const result = await AsyncStorage.multiGet(keys);
-
-    return result.map(req => JSON.parse(req)).forEach(console.log);
-  } catch (error) {
-    console.error(error)
-  }
-}
+// storeToken = async (data) => {
+//   console.log(data.key);
+//   const key = JSON.stringify(data.key);
+//   try {
+//     await AsyncStorage.setItem('key', key);
+//     this.importData();
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
+//
+// importData = async () => {
+//   try {
+//     const keys = await AsyncStorage.getAllKeys();
+//     const result = await AsyncStorage.multiGet(keys);
+//
+//     return result.map(req => JSON.parse(req)).forEach(console.log);
+//   } catch (error) {
+//     console.error(error)
+//   }
+// }
 
   render() {
     return (
