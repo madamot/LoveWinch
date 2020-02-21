@@ -159,7 +159,9 @@ export default class Home extends Component {
     desLongitude: null,
     cordLatitude:51.060891,
     cordLongitude:-1.313165,
-    animation: new Animated.Value(0)
+    animation: new Animated.Value(0),
+    loggedin: false,
+    name: null,
   }
 
   toggleOpen = () => {
@@ -187,13 +189,22 @@ export default class Home extends Component {
 
   getData = async () => {
   try {
-    const value = await AsyncStorage.getItem('key')
-    if(value !== null) {
-      console.log('yay');
+    const name = await AsyncStorage.getItem('name')
+
+    const {params} = this.props.navigation.state;
+    if(name !== null) {
+      this.setState({loggedin: true, name: name})
+    } else {
+      this.setState({loggedin: false, name: null})
     }
+    console.log('reloaded home');
   } catch(e) {
-    // error reading value
+    console.log('oh');
   }
+}
+
+hfunc() {
+  this.getData()
 }
 
 
@@ -376,7 +387,7 @@ mergeLot = () => {
       }, {
         translateY: this.state.animation.interpolate({
           inputRange: [0,1],
-          outputRange: [0, 70]
+          outputRange: [0, 210]
         })
       }]
     }
@@ -398,7 +409,7 @@ mergeLot = () => {
       }, {
         translateY: this.state.animation.interpolate({
           inputRange: [0,1],
-          outputRange: [0, 210]
+          outputRange: [0, 70]
         })
       }]
     }
@@ -479,11 +490,29 @@ mergeLot = () => {
           </Animated.View>
         </TouchableWithoutFeedback>
 
-        <TouchableWithoutFeedback onPress={() => this.props.navigation.navigate('Login')}>
+        {/* {this.state.loggedin == null && this.state.name == null ?
+          <TouchableWithoutFeedback onPress={() => this.props.navigation.navigate('Login')}>
+            <Animated.View style={[styles.button, styles.other, loginStyle]}>
+          <Text>yay</Text>
+            </Animated.View>
+          </TouchableWithoutFeedback>
+          :
+          <TouchableWithoutFeedback onPress={() => this.props.navigation.navigate('Login')}>
+          <Animated.View style={[styles.button, styles.other, loginStyle]}>
+            <Text>&#x1f511;</Text>
+          </Animated.View>
+          </TouchableWithoutFeedback>
+        } */}
+
+        {this.state.loggedin === true ?
+          null
+        : <TouchableWithoutFeedback onPress={() => this.props.navigation.navigate('Login',
+          {callHome:this.hfunc.bind(this)})}>
           <Animated.View style={[styles.button, styles.other, loginStyle]}>
             <Text>&#x1f511;</Text>
           </Animated.View>
         </TouchableWithoutFeedback>
+        }
 
         <TouchableWithoutFeedback onPress={this.toggleOpen}>
           <View style={[styles.button, styles.menu]}>

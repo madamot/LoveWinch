@@ -11,6 +11,8 @@ import {
 
 export default class Settings extends Component {
 
+  
+
   state = {
     name: null,
   }

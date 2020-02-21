@@ -14,7 +14,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 
 export default class Signup extends Component {
   static navigationOptions = () => ({
-    title: 'Authentication',
+    title: 'Signup',
     headerTintColor: 'blue',
     headerStyle: {
       backgroundColor: '#674b99',
