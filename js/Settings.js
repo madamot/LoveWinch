@@ -7,11 +7,16 @@ import {
   TouchableOpacity
  } from 'react-native';
  import AsyncStorage from '@react-native-community/async-storage';
+ import { useNavigation } from '@react-navigation/native';
 
 
 export default class Settings extends Component {
 
-  
+  componentWillUnmount() {
+
+    const {params} = this.props.navigation.state;
+    params.callHome();
+  }
 
   state = {
     name: null,
@@ -46,6 +51,7 @@ export default class Settings extends Component {
     .then((data) => {
       console.log('Success:', data);
       this.removeItemValue();
+      this.props.navigation.navigate('Home');
     })
     .catch((error) => {
       console.error('Error:', error);

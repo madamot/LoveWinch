@@ -484,7 +484,8 @@ mergeLot = () => {
           </Animated.View>
         </TouchableWithoutFeedback>
 
-        <TouchableWithoutFeedback onPress={() => this.props.navigation.navigate('Settings')}>
+        <TouchableWithoutFeedback onPress={() => this.props.navigation.navigate('Settings',
+          {callHome:this.hfunc.bind(this)})}>
           <Animated.View style={[styles.button, styles.other, settingsStyle]}>
             <Text>&#x2699;</Text>
           </Animated.View>
