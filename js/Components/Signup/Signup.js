@@ -22,7 +22,6 @@ export default class Signup extends Component {
       shadowOpacity: 0,
     },
     headerTintColor: 'white',
-
   });
 
   state = {

@@ -22,6 +22,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 
 import List from './Components/List';
 import Detail from './Components/Detail';
+import Trails from './Components/Trails';
 
 const { Marker } = MapView;
 const { height, width } = Dimensions.get('screen');
@@ -30,7 +31,7 @@ const LATITUDE = 51.064022;
 const LONGITUDE = -1.316288;
 const LATITUDE_DELTA = 0.0322;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
-const TAB_BAR_HEIGHT = -20;
+const TAB_BAR_HEIGHT = -80;
 
     // const locations = [
     //   {
@@ -157,8 +158,8 @@ export default class Home extends Component {
     x: 'false',
     desLatitude: null,
     desLongitude: null,
-    cordLatitude:51.060891,
-    cordLongitude:-1.313165,
+    // cordLatitude:51.060891,-1.313165,
+    // cordLongitude:-1.313165,
     animation: new Animated.Value(0),
     loggedin: false,
     name: null,
@@ -307,7 +308,6 @@ hfunc() {
       }
   }
 
-
 mergeLot = () => {
     if (this.state.latitude != null && this.state.longitude!=null && this.state.desLongitude != null && this.state.desLatitude != null)
      {
@@ -323,7 +323,44 @@ mergeLot = () => {
        console.log(concatdesLot);
      }
    }
-   "51.060891,-1.313165"
+
+ // trailLot = () => {
+ //     if (this.state.latitude != null && this.state.longitude!=null)
+ //      {
+ //        let concatLot = this.state.latitude +","+this.state.longitude
+ //        let concatdesLot = this.state.desLatitude +","+this.state.desLongitude
+ //        this.setState({
+ //          concat: concatLot,
+ //          concatdes: concatdesLot
+ //        }, () => {
+ //          this.getDirections(concatLot, concatdesLot);
+ //        });
+ //        console.log(concatLot);
+ //        console.log(concatdesLot);
+ //      }
+ //    }
+
+  async getTrails(startLoc, destinationLoc) {
+      try {
+          let resp = await fetch(`https://maps.googleapis.com/maps/api/directions/json?origin=51.052368,-1.338736&destination=51.047661,-1.322166&waypoints=51.064042,-1.316191&key=AIzaSyALxSvI1eqDi0VooB6wRZGG0Du-T8doVnI&mode=walking`)
+          let respJson = await resp.json();
+          let points = Polyline.decode(respJson.routes[0].overview_polyline.points);
+          let coords = points.map((point, index) => {
+              return  {
+                  latitude : point[0],
+                  longitude : point[1]
+              }
+          })
+          this.setState({coords: coords})
+          this.setState({x: "true"})
+          return coords
+          console.log(this.state.coords);
+      } catch(error) {
+         console.log(error);
+         this.setState({x: "error"})
+         return error
+      }
+  }
 
   renderHeader() {
     return (
@@ -380,6 +417,15 @@ mergeLot = () => {
   }
 
   renderMap() {
+
+    const menuStyle = {
+      transform: [{
+        rotate: this.state.animation.interpolate({
+          inputRange: [0,1],
+          outputRange: ['0deg', '90deg']
+        })
+      }]
+    }
 
     const loginStyle = {
       transform: [{
@@ -453,11 +499,6 @@ mergeLot = () => {
             </Marker>
           ))}
 
-          {/* <MapView.Polyline
-            coordinates={this.state.coords}
-            strokeWidth={2}
-          strokeColor="red"/> */}
-
           {!!this.state.latitude && !!this.state.longitude && this.state.x == 'true' &&
             <MapView.Polyline
               coordinates={this.state.coords}
@@ -466,17 +507,16 @@ mergeLot = () => {
             />
           }
 
-
-          {/* {!!this.state.latitude && !!this.state.longitude && this.state.x == 'error' &&
+          {!!this.state.latitude && !!this.state.longitude && this.state.x == 'error' &&
             <MapView.Polyline
               coordinates={[
-            {latitude: this.state.latitude, longitude: this.state.longitude},
-            {latitude: this.state.cordLatitude, longitude: this.state.cordLongitude},
+                {latitude: this.state.latitude, longitude: this.state.longitude},
+                {latitude: this.state.cordLatitude, longitude: this.state.cordLongitude},
               ]}
               strokeWidth={2}
               strokeColor="yellow"
             />
-          } */}
+          }
         </MapView>
         <TouchableWithoutFeedback onPress={() => this.props.navigation.navigate('Achievements')}>
           <Animated.View style={[styles.button, styles.other, achievementsStyle]}>
@@ -485,30 +525,16 @@ mergeLot = () => {
         </TouchableWithoutFeedback>
 
         <TouchableWithoutFeedback onPress={() => this.props.navigation.navigate('Settings',
-          {callHome:this.hfunc.bind(this)})}>
+          {callHome:this.getData.bind(this)})}>
           <Animated.View style={[styles.button, styles.other, settingsStyle]}>
             <Text>&#x2699;</Text>
           </Animated.View>
         </TouchableWithoutFeedback>
 
-        {/* {this.state.loggedin == null && this.state.name == null ?
-          <TouchableWithoutFeedback onPress={() => this.props.navigation.navigate('Login')}>
-            <Animated.View style={[styles.button, styles.other, loginStyle]}>
-          <Text>yay</Text>
-            </Animated.View>
-          </TouchableWithoutFeedback>
-          :
-          <TouchableWithoutFeedback onPress={() => this.props.navigation.navigate('Login')}>
-          <Animated.View style={[styles.button, styles.other, loginStyle]}>
-            <Text>&#x1f511;</Text>
-          </Animated.View>
-          </TouchableWithoutFeedback>
-        } */}
-
         {this.state.loggedin === true ?
           null
         : <TouchableWithoutFeedback onPress={() => this.props.navigation.navigate('Login',
-          {callHome:this.hfunc.bind(this)})}>
+          {callHome:this.getData.bind(this)})}>
           <Animated.View style={[styles.button, styles.other, loginStyle]}>
             <Text>&#x1f511;</Text>
           </Animated.View>
@@ -516,9 +542,9 @@ mergeLot = () => {
         }
 
         <TouchableWithoutFeedback onPress={this.toggleOpen}>
-          <View style={[styles.button, styles.menu]}>
+          <Animated.View style={[styles.button, styles.menu, menuStyle]}>
             <Text stlye={styles.menuText}>></Text>
-          </View>
+          </Animated.View>
         </TouchableWithoutFeedback>
       </View>
     )
@@ -577,7 +603,9 @@ mergeLot = () => {
         </View>
         <View>
           <View style={styles.trailTitleCon}>
-            <Text style={styles.trailTitle}>Add locations to make your own trail!</Text>
+
+            <Trails locate={() => this.getTrails()}/>
+
           </View>
         </View>
       </View>
@@ -608,10 +636,11 @@ mergeLot = () => {
          {this.renderHeader()}
          {this.renderMap()}
          <BottomDrawer
-           containerHeight={300}
+           containerHeight={500}
            offset={TAB_BAR_HEIGHT}
            startUp={false}
            shadow={true}
+           elevation={2}
            ref={drawer => this.drawer = drawer}
          >
            <ScrollView>
@@ -743,6 +772,7 @@ const styles = StyleSheet.create({
    shadowOffset: { x: 2, y: 0 },
    shadowRadius: 2,
    borderRadius: 30,
+   elevation: 1,
    position: "absolute",
    top: 15,
    left: 20,
@@ -756,5 +786,5 @@ const styles = StyleSheet.create({
  menuText: {
    color: "#FFF",
    fontWeight: 'bold',
- }
+ },
 });
