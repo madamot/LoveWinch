@@ -15,34 +15,67 @@ import {
 import { createStackNavigator } from '@react-navigation/stack';
 
  const Detail = detailItem => {
-   return (
-       <View>
-         <View style={detailStyles.backButton}>
-           <Button title='X' onPress={detailItem.handler} />
-         </View>
+   if (detailItem.content == 'loc') {
+     return (
          <View>
-           <View style={detailStyles.focusData}>
-             <Text style={detailStyles.dataTitle}>{detailItem.location.name}</Text>
-             <Text>{detailItem.location.type}</Text>
-             <View style={detailStyles.actions}>
-               <TouchableOpacity
-                 style={detailStyles.directions}
-                 onPress={() => detailItem.directions()}
-               >
-                 <Text style={detailStyles.buttonTxt}>Directions</Text>
-               </TouchableOpacity>
-               <TouchableOpacity
-                 style={detailStyles.ARButton}
-                 onPress={() => detailItem.nav()}
-               >
-                 <Text style={detailStyles.buttonTxt}>Go to AR Content</Text>
-               </TouchableOpacity>
+           <View style={detailStyles.backButton}>
+             <Button title='X' onPress={detailItem.handler} />
+           </View>
+           <View>
+             <View style={detailStyles.focusData}>
+               <Text style={detailStyles.dataTitle}>{detailItem.location.name}</Text>
+               <Text>{detailItem.location.type}</Text>
+               <View style={detailStyles.actions}>
+                 <TouchableOpacity
+                   style={detailStyles.directions}
+                   onPress={() => detailItem.directions()}
+                 >
+                   <Text style={detailStyles.buttonTxt}>Directions</Text>
+                 </TouchableOpacity>
+                 <TouchableOpacity
+                   style={detailStyles.ARButton}
+                   onPress={() => detailItem.nav()}
+                 >
+                   <Text style={detailStyles.buttonTxt}>Go to AR Content</Text>
+                 </TouchableOpacity>
+               </View>
+               <Text>{detailItem.location.description}</Text>
              </View>
-             <Text>{detailItem.location.description}</Text>
            </View>
          </View>
-       </View>
-     );
+       );
+   }
+   else {
+     return (
+         <View>
+           <View style={detailStyles.backButton}>
+             <Button title='X' onPress={detailItem.handler} />
+           </View>
+           <View>
+             {/* <View style={detailStyles.focusData}>
+               <Text style={detailStyles.dataTitle}>{detailItem.location.name}</Text>
+               <Text>{detailItem.location.type}</Text>
+               <View style={detailStyles.actions}>
+                 <TouchableOpacity
+               style={detailStyles.directions}
+               onPress={() => detailItem.directions()}
+                 >
+               <Text style={detailStyles.buttonTxt}>Directions</Text>
+                 </TouchableOpacity>
+                 <TouchableOpacity
+               style={detailStyles.ARButton}
+               onPress={() => detailItem.nav()}
+                 >
+               <Text style={detailStyles.buttonTxt}>Go to AR Content</Text>
+                 </TouchableOpacity>
+               </View>
+               <Text>{detailItem.location.description}</Text>
+             </View> */}
+           </View>
+         </View>
+       );
+   }
+
    };
 
 

@@ -239,6 +239,7 @@ hfunc() {
 
   handleCon = (loc) => {
       this.setState({ content: loc });
+      console.log(this.state.content);
 
     }
 
@@ -267,23 +268,40 @@ hfunc() {
 
 
   focusHandler = (place) => {
-    if (this.state.selection === false) {
-      this.setState({ selection: true });
-      this.setState({ chosenLocation: place });
-      console.log(this.state.chosenLocation);
-      this.setState({
-        desLatitude: place.latitude,
-        desLongitude: place.longitude,
-      })
-      console.log(this.state.desLatitude);
-      console.log(this.state.desLongitude);
-      if (this.state.chosenLocation) {
-        this.goToPlace(this.state.chosenLocation.latitude, this.state.chosenLocation.longitude);
+    if (this.state.content == 'loc') {
+      if (this.state.selection === false) {
+        this.setState({ selection: true });
+        this.setState({ chosenLocation: place });
+        console.log(this.state.chosenLocation);
+        this.setState({
+          desLatitude: place.latitude,
+          desLongitude: place.longitude,
+        })
+        console.log(this.state.desLatitude);
+        console.log(this.state.desLongitude);
+        if (this.state.chosenLocation) {
+          this.goToPlace(this.state.chosenLocation.latitude, this.state.chosenLocation.longitude);
+        }
+      } else {
+        this.setState({ selection: false });
+        this.goBack();
       }
-    } else {
-      this.setState({ selection: false });
-      this.goBack();
     }
+    else {
+      if (this.state.selection === false) {
+        this.setState({ selection: true });
+        console.log('trail');
+
+
+        // if (this.state.chosenLocation) {
+        //   this.goToPlace(this.state.chosenLocation.latitude, this.state.chosenLocation.longitude);
+        // }
+      } else {
+        this.setState({ selection: false });
+        this.goBack();
+      }
+    }
+
   }
 
   async getDirections(startLoc, destinationLoc) {
@@ -318,6 +336,7 @@ mergeLot = () => {
          concatdes: concatdesLot
        }, () => {
          this.getDirections(concatLot, concatdesLot);
+         this.goBack();
        });
        console.log(concatLot);
        console.log(concatdesLot);
@@ -351,10 +370,12 @@ mergeLot = () => {
                   longitude : point[1]
               }
           })
+          this.focusHandler()
           this.setState({coords: coords})
           this.setState({x: "true"})
           return coords
           console.log(this.state.coords);
+
       } catch(error) {
          console.log(error);
          this.setState({x: "error"})
@@ -417,7 +438,6 @@ mergeLot = () => {
   }
 
   renderMap() {
-
     const menuStyle = {
       transform: [{
         rotate: this.state.animation.interpolate({
@@ -576,7 +596,7 @@ mergeLot = () => {
     else {
       return (
           <View style={styles.focusContainer}>
-            <Detail location={chosenLocation} handler={this.focusHandler} directions={this.mergeLot} nav={() => this.props.navigation.navigate('ARContent', {
+            <Detail location={chosenLocation} content={content} handler={this.focusHandler} directions={this.mergeLot} nav={() => this.props.navigation.navigate('ARContent', {
               location: chosenLocation.name,
               otherParam: 'anything you want here',
             })} />
@@ -587,29 +607,41 @@ mergeLot = () => {
 
   renderTrails() {
     const { locations, trails, selection, chosenLocation, tabFilter, content } = this.state;
-    return (
-      <View style={styles.trails}>
-        <View style={styles.drawerTabs}>
-          <View style={styles.drawerTab, content == 'loc' ? styles.activeDrawerTab : null}>
-            <Text style={styles.drawerTitle} onPress={() => this.handleCon('loc')}>
-              Locations
-            </Text>
+    if (!selection) {
+      return (
+        <View style={styles.trails}>
+          <View style={styles.drawerTabs}>
+            <View style={styles.drawerTab, content == 'loc' ? styles.activeDrawerTab : null}>
+              <Text style={styles.drawerTitle} onPress={() => this.handleCon('loc')}>
+                Locations
+              </Text>
+            </View>
+            <View style={styles.drawerTab, content == 'trails' ? styles.activeDrawerTab : null}>
+              <Text style={styles.drawerTitle} onPress={() => this.handleCon('trails')}>
+                Trails
+              </Text>
+            </View>
           </View>
-          <View style={styles.drawerTab, content == 'trails' ? styles.activeDrawerTab : null}>
-            <Text style={styles.drawerTitle} onPress={() => this.handleCon('trails')}>
-              Trails
-            </Text>
+          <View>
+            <View style={styles.trailTitleCon}>
+
+              <Trails content={content} locate={() => this.getTrails()}/>
+
+            </View>
           </View>
         </View>
-        <View>
-          <View style={styles.trailTitleCon}>
-
-            <Trails locate={() => this.getTrails()}/>
-
-          </View>
-        </View>
-      </View>
-    )
+      )
+    }
+      else {
+        return (
+            <View style={styles.focusContainer}>
+              <Detail location={chosenLocation} handler={this.focusHandler} directions={this.mergeLot} nav={() => this.props.navigation.navigate('ARContent', {
+                location: chosenLocation.name,
+                otherParam: 'anything you want here',
+              })} />
+            </View>
+        )
+      }
   }
 
   renderDrawer() {

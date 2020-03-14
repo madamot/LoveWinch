@@ -71,6 +71,7 @@ export default class Settings extends Component {
   render() {
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Text>{this.state.name}</Text>
         <TouchableOpacity
           style={styles.button}
           onPress={() => this.logoutHandler()}

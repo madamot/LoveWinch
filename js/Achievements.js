@@ -13,6 +13,9 @@ import {
    {
      id: 1,
      name: 'Visit the Cathedral!',
+     users: [
+       'testuser18',
+     ],
    },
    {
      id: 2,
@@ -33,6 +36,7 @@ export default class Achievements extends Component {
   state = {
     loggedin: false,
     name: null,
+    achievements: achievements,
   }
 
 
@@ -55,16 +59,19 @@ export default class Achievements extends Component {
 
   render() {
     const { loggedin } = this.state;
+    const sorted = this.state.achievements.users;
+    console.log(this.state.achievements[0].users);
+    if (this.state.achievements[0].users = this.state.name) {
+      console.log('unlocked');
+    }
     if (loggedin == true) {
       return (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <View>
           {achievements.map(place =>
-            <TouchableOpacity onPress={() => listItem.handler(place)} key={place.id}>
-              <View style={styles.place}>
-                <View style={styles.pic}></View>
-                <Text>{place.name}</Text>
-              </View>
-            </TouchableOpacity>
+            <View style={ styles.containerUnlock} key={place.id}>
+              <View style={styles.pic}></View>
+              <Text style={styles.title}>{place.name}</Text>
+            </View>
           )}
         </View>
       );
@@ -90,33 +97,48 @@ export default class Achievements extends Component {
 }
 
 const styles = StyleSheet.create({
-  pic: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'blue',
-  },
-  pic: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'blue',
-  },
-  button: {
+  container: {
+    padding: 20,
+    left: 0,
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 15,
-    borderWidth: 0.5,
-    borderColor: '#147EFB',
-    borderRadius: 10,
-    padding: 15,
-    marginRight: 1,
-    backgroundColor: '#147EFB',
-    color: 'white',
+    backgroundColor: '#d3d3d3',
+    borderBottomColor: 'grey',
+    borderBottomWidth: 0.3,
   },
-  buttonTxt: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: 'bold',
+  containerUnlock: {
+    padding: 20,
+    left: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomColor: 'grey',
+    borderBottomWidth: 0.3,
   },
+  pic: {
+    left: 0,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: 'grey',
+  },
+  title: {
+    paddingLeft: 25,
+  },
+  // button: {
+  //   alignItems: 'center',
+  //   justifyContent: 'center',
+  //   marginTop: 15,
+  //   borderWidth: 0.5,
+  //   borderColor: '#147EFB',
+  //   borderRadius: 10,
+  //   padding: 15,
+  //   marginRight: 1,
+  //   backgroundColor: '#147EFB',
+  //   color: 'white',
+  // },
+  // buttonTxt: {
+  //   color: 'white',
+  //   fontSize: 12,
+  //   fontWeight: 'bold',
+  // },
 })
