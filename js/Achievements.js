@@ -2,11 +2,16 @@ import React, { Component } from 'react';
 import {
   StyleSheet,
   View,
+  ScrollView,
   Text,
   Button,
+  Dimensions,
   TouchableOpacity
  } from 'react-native';
  import AsyncStorage from '@react-native-community/async-storage';
+
+ const { height, width } = Dimensions.get('screen');
+
 
 
  const achievements = [
@@ -15,19 +20,47 @@ import {
      name: 'Visit the Cathedral!',
      users: [
        'testuser18',
+       'testuser17'
      ],
    },
    {
      id: 2,
      name: 'Visit the Station',
+     users: [
+       'testuser18',
+       'testuser17'
+     ],
    },
    {
      id: 3,
-     name: 'Example',
+     name: 'Example 1',
+     users: [
+       'testuser17'
+     ],
    },
    {
      id: 4,
-     name: 'Example',
+     name: 'Example 2',
+     users: [
+       'testuser17'
+     ],
+   },
+   {
+     id: 5,
+     name: 'Example 3',
+     users: [
+       'testuser16'
+     ],
+   },
+   {
+     id: 6,
+     name: 'Example 4',
+     users: [
+       'testuser16',
+       'testuser18',
+       'testuser15',
+       'testuser13'
+     ],
    },
    ]
 
@@ -37,11 +70,16 @@ export default class Achievements extends Component {
     loggedin: false,
     name: null,
     achievements: achievements,
+    userAchievements: [],
+    userNotAchieved: [],
   }
 
 
   componentDidMount = () => {
+
     this.getData();
+
+
     console.log('reloaded');
   }
 
@@ -52,27 +90,113 @@ export default class Achievements extends Component {
     if(name !== null) {
       this.setState({loggedin: true, name: name})
     }
+    this.check()
   } catch(e) {
     console.log('oh');
   }
+
 }
+
+  // check = async () => {
+  //   let userAchievements = this.state.userAchievements;
+  //   let userNotAchieved = this.state.userNotAchieved;
+  //   let achieve = this.state.achievements;
+  //   for (var i = 0; i < achieve.length; i++) {
+  //     let achieveUsers = achieve[i].users;
+  //     for (var k = 0; k < achieveUsers.length; k++) {
+  //       if (achieveUsers[k].includes(this.state.name)) {
+  //         let userAchievements = this.state.userAchievements.push(achieve[i])
+  //
+  //         // splice out from completed vars
+  //
+  //         // userAchieves([...userAchievements, achieve[i]]);
+  //       }else {
+  //         // let userNotAchieved = userNotAchieved.splice(achieve[i])
+  //         let userNotAchieved = this.state.userNotAchieved.push(achieve[i])
+  //       }
+  //
+  //     }
+  //   }
+  //   this.setState({userAchievements: userAchievements, userNotAchieved: userNotAchieved})
+  //   // console.log(userAchievements);
+  //   console.log(this.state.achievements);
+  // }
+
+  check = async () => {
+    let userAchievements = this.state.userAchievements;
+    let userNotAchieved = this.state.userNotAchieved;
+    let achieve = this.state.achievements;
+    for (var i = 0; i < achieve.length; i++) {
+      let achieveUsers = achieve[i].users;
+      // console.log(achieve[i].users);
+      for (var m = 0; m < achieveUsers.length; m++) {
+
+        if (achieveUsers[m] === this.state.name) {
+          let userAchievements = this.state.userAchievements.push(achieve[i])
+          console.log('ACHIEVED', achieve[i]);
+          break;
+          // splice out from completed vars
+
+          // userAchieves([...userAchievements, achieve[i]]);
+        } else if (achieveUsers[m] != this.state.name) {
+            if ((m + 1) == (achieveUsers.length)) {
+              let userNotAchieved = this.state.userNotAchieved.push(achieve[i])
+            } else {
+              continue;
+            }
+          // let userNotAchieved = userNotAchieved.splice(achieve[i])
+
+          console.log('NOT ACHIEVED', achieve[i]);
+        }
+
+      }
+      // for (var k = 0; k < achieveUsers.length; k++) {
+      //   if (achieveUsers[k].includes(this.state.name)) {
+      //
+      //   }else {
+      //
+      //   }
+      //
+      // }
+    }
+    this.setState({userAchievements: userAchievements, userNotAchieved: userNotAchieved})
+    // console.log(userAchievements);
+    // console.log(userNotAchieved);
+  }
+
 
   render() {
     const { loggedin } = this.state;
-    const sorted = this.state.achievements.users;
-    console.log(this.state.achievements[0].users);
-    if (this.state.achievements[0].users = this.state.name) {
-      console.log('unlocked');
-    }
+    const achieveEasy = this.state.achievements.users;
+    // // console.log(this.state.achievements[0].users);
+    // if (achieve.includes(this.state.name)) {
+    //   console.log('unlocked');
+    // }
     if (loggedin == true) {
+
       return (
-        <View>
-          {achievements.map(place =>
-            <View style={ styles.containerUnlock} key={place.id}>
-              <View style={styles.pic}></View>
-              <Text style={styles.title}>{place.name}</Text>
+        <View style={styles.box}>
+          <View style={styles.hide}>
+            <Text style={styles.emoji}>&#129323;</Text>
+          </View>
+          <ScrollView>
+            <View>
+              {this.state.userAchievements.map(achieve =>
+                <View style={ styles.containerUnlock} key={achieve.id}>
+                  <View style={styles.pic}></View>
+                  <Text style={styles.title}>{achieve.name}</Text>
+                </View>
+              )}
             </View>
-          )}
+            <View>
+              {this.state.userNotAchieved.map(achieve =>
+                <View style={styles.container} key={achieve.id}>
+                  <View style={styles.pic}></View>
+                  <Text style={styles.title}>{achieve.name}</Text>
+                </View>
+              )}
+            </View>
+          </ScrollView>
         </View>
       );
     }
@@ -97,6 +221,9 @@ export default class Achievements extends Component {
 }
 
 const styles = StyleSheet.create({
+  box: {
+    height: height,
+  },
   container: {
     padding: 20,
     left: 0,
@@ -111,6 +238,7 @@ const styles = StyleSheet.create({
     left: 0,
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: '#6fbf73',
     borderBottomColor: 'grey',
     borderBottomWidth: 0.3,
   },
@@ -124,6 +252,19 @@ const styles = StyleSheet.create({
   title: {
     paddingLeft: 25,
   },
+  hide: {
+    position: 'absolute',
+    width: width,
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emoji: {
+    textAlign: 'center',
+    fontSize: 50,
+    padding: 10,
+  }
   // button: {
   //   alignItems: 'center',
   //   justifyContent: 'center',

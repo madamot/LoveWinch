@@ -20,7 +20,18 @@ import { createStackNavigator } from '@react-navigation/stack';
        <View>
          <View>
            <View>
-             <Text onPress={trailItem.locate}>Trail 1</Text>
+             {/* <Text onPress={trailItem.locate}>Trail 1</Text> */}
+             {trailItem.list.map(place =>
+               <TouchableOpacity onPress={() => trailItem.handler(place)} key={place.id}>
+                 <View>
+                   <Image
+                     style={{width: 300, height: 100, borderRadius: 5,}}
+                     source={{uri: place.image}}
+                   />
+                   <Text>{place.name}</Text>
+                 </View>
+               </TouchableOpacity>
+             )}
            </View>
          </View>
        </View>

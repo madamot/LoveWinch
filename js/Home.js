@@ -74,38 +74,58 @@ const TAB_BAR_HEIGHT = -80;
     //   },
     //   ]
 
-    const trails = [
-      {
-        id: 1,
-        name: 'Cathedral',
-        image: 'https://www.winchester-cathedral.org.uk/wp-content/uploads/Winchester-074-23102013-A4.jpg',
-      },
-      {
-        id: 2,
-        name: 'Great Hall',
-        image: 'https://www.winchester-cathedral.org.uk/wp-content/uploads/Winchester-074-23102013-A4.jpg',
-      },
-      {
-        id: 3,
-        name: 'Cathedral',
-        image: 'https://www.winchester-cathedral.org.uk/wp-content/uploads/Winchester-074-23102013-A4.jpg',
-      },
-      {
-        id: 4,
-        name: 'Great Hall',
-        image: 'https://www.winchester-cathedral.org.uk/wp-content/uploads/Winchester-074-23102013-A4.jpg',
-      },
-      {
-        id: 5,
-        name: 'Cathedral',
-        image: 'https://www.winchester-cathedral.org.uk/wp-content/uploads/Winchester-074-23102013-A4.jpg',
-      },
-      {
-        id: 6,
-        name: 'Great Hall',
-        image: 'https://www.winchester-cathedral.org.uk/wp-content/uploads/Winchester-074-23102013-A4.jpg',
-      },
-      ]
+    // const trails = [
+    //   {
+    //     id: 1,
+    //     name: 'Trail 1',
+    //     origin: '51.052368,-1.338736',
+    //     destination: '51.047661,-1.322166',
+    //     waypoints: [
+    //       '51.064042,-1.316191',
+    //     ],
+    //     image: 'https://www.winchester-cathedral.org.uk/wp-content/uploads/Winchester-074-23102013-A4.jpg',
+    //   },
+    //   {
+    //     id: 2,
+    //     name: 'Trail 2',
+    //     origin: '',
+    //     destination: '',
+    //     waypoints: [],
+    //     image: 'https://www.winchester-cathedral.org.uk/wp-content/uploads/Winchester-074-23102013-A4.jpg',
+    //   },
+    //   {
+    //     id: 3,
+    //     name: 'Trail 3',
+    //     origin: '',
+    //     destination: '',
+    //     waypoints: [],
+    //     image: 'https://www.winchester-cathedral.org.uk/wp-content/uploads/Winchester-074-23102013-A4.jpg',
+    //   },
+    //   {
+    //     id: 4,
+    //     name: 'Trail 4',
+    //     origin: '',
+    //     destination: '',
+    //     waypoints: [],
+    //     image: 'https://www.winchester-cathedral.org.uk/wp-content/uploads/Winchester-074-23102013-A4.jpg',
+    //   },
+    //   {
+    //     id: 5,
+    //     name: 'Trail 5',
+    //     origin: '',
+    //     destination: '',
+    //     waypoints: [],
+    //     image: 'https://www.winchester-cathedral.org.uk/wp-content/uploads/Winchester-074-23102013-A4.jpg',
+    //   },
+    //   {
+    //     id: 6,
+    //     name: 'Trail 6',
+    //     origin: '',
+    //     destination: '',
+    //     waypoints: [],
+    //     image: 'https://www.winchester-cathedral.org.uk/wp-content/uploads/Winchester-074-23102013-A4.jpg',
+    //   },
+    // ]
 
 export default class Home extends Component {
   componentDidMount = () => {
@@ -117,15 +137,21 @@ export default class Home extends Component {
        let initalPosition = {
          latitude: position.coords.latitude,
          longitude: position.coords.longitude,
-         latitudeDelta: 0.0322,
-         longitudeDelta: 0.035,
+         latitudeDelta: 0.03,
+         longitudeDelta: 0.03,
        }
        this.setState({initalPosition});
        this.setState({
          latitude: position.coords.latitude,
          longitude: position.coords.longitude,
        });
-
+       let travel = {
+         latitude: position.coords.latitude,
+         longitude: position.coords.longitude,
+         latitudeDelta: 0.005,
+         longitudeDelta: 0.005,
+       }
+       this.setState({travel});
      },
      (error) => this.setState({ error: error.message }),
      { enableHighAccuracy: false, timeout: 200000, maximumAge: 1000 },
@@ -148,8 +174,9 @@ export default class Home extends Component {
     tabFilter: [],
     selection: false,
     locations: [],
-    trails: trails,
+    trails: [],
     chosenLocation: null,
+    chosenTrail: null,
     content: 'loc',
     latitude: null,
     longitude: null,
@@ -186,27 +213,32 @@ export default class Home extends Component {
     .catch(err => {
       console.log("error getting backend api");
     });
+    axios
+      .get('http://127.0.0.1:8000/api/v1/trails/')
+      .then(res => {
+        this.setState({ trails: res.data })
+        console.log(this.state.trails);
+      })
+      .catch(err => {
+        console.log("error getting backend api");
+      });
   }
 
   getData = async () => {
   try {
     const name = await AsyncStorage.getItem('name')
 
-    const {params} = this.props.navigation.state;
     if(name !== null) {
       this.setState({loggedin: true, name: name})
     } else {
       this.setState({loggedin: false, name: null})
     }
-    console.log('reloaded home');
+      console.log('reloaded home');
   } catch(e) {
-    console.log('oh');
+      console.log('oh');
   }
 }
 
-hfunc() {
-  this.getData()
-}
 
 
   onRegionChange(region) {
@@ -240,12 +272,11 @@ hfunc() {
   handleCon = (loc) => {
       this.setState({ content: loc });
       console.log(this.state.content);
-
     }
 
 
   goToPlace(latitude, longitude) {
-    const chosenLocation = this.state.latlng;
+    // const chosenLocation = this.state.latlng;
     this.map.animateCamera({ center: {
       latitude:
         latitude,
@@ -256,13 +287,30 @@ hfunc() {
   }
 
   goBack() {
-    this.map.animateCamera({ center: this.state.initalPosition });
-    this.setState({
+    this.map.animateToRegion({
+      latitude: this.state.latitude,
+      longitude: this.state.longitude,
+      latitudeDelta: 0.03,
+      longitudeDelta: 0.03,
+    });
 
+    this.setState({
       error: null,
       coords: [],
       x: 'false',
     })
+    // this.map.animateCamera({ pitch: this.getRandomFloat(0, 90) });
+  }
+
+  travel() {
+    this.map.animateToRegion({
+      latitude: this.state.latitude,
+      longitude: this.state.longitude,
+      latitudeDelta: 0.005,
+      longitudeDelta: 0.005,
+    });
+
+
     // this.map.animateCamera({ pitch: this.getRandomFloat(0, 90) });
   }
 
@@ -290,12 +338,18 @@ hfunc() {
     else {
       if (this.state.selection === false) {
         this.setState({ selection: true });
-        console.log('trail');
+        this.setState({ chosenTrail: place });
+        this.setState({
+          trailLatOrig: place.origin.latitude,
+          trailLonOrig: place.origin.longitude,
+          trailLatDes: place.destination.latitude,
+          trailLonDes: place.destination.longitude,
+          trailLatWay1: place.waypoints.latitude,
+          trailLonWay1: place.waypoints.longitude,
+        })
+          this.mergeLot();
+          this.goToPlace(this.state.trailLatOrig, this.state.trailLonOrig);
 
-
-        // if (this.state.chosenLocation) {
-        //   this.goToPlace(this.state.chosenLocation.latitude, this.state.chosenLocation.longitude);
-        // }
       } else {
         this.setState({ selection: false });
         this.goBack();
@@ -326,7 +380,30 @@ hfunc() {
       }
   }
 
+  async getTrails(startLoc, destinationLoc, wayLoc) {
+      try {
+          let resp = await fetch(`https://maps.googleapis.com/maps/api/directions/json?origin=${ startLoc }&destination=${ destinationLoc }&waypoints=${ wayLoc }&key=AIzaSyALxSvI1eqDi0VooB6wRZGG0Du-T8doVnI&mode=walking`)
+          let respJson = await resp.json();
+          let points = Polyline.decode(respJson.routes[0].overview_polyline.points);
+          let coords = points.map((point, index) => {
+              return  {
+                  latitude : point[0],
+                  longitude : point[1]
+              }
+          })
+          this.setState({coords: coords})
+          this.setState({x: "true"})
+          return coords
+          console.log(this.state.coords);
+      } catch(error) {
+         console.log(error);
+         this.setState({x: "error"})
+         return error
+      }
+  }
+
 mergeLot = () => {
+  if (this.state.content == 'loc') {
     if (this.state.latitude != null && this.state.longitude!=null && this.state.desLongitude != null && this.state.desLatitude != null)
      {
        let concatLot = this.state.latitude +","+this.state.longitude
@@ -336,12 +413,23 @@ mergeLot = () => {
          concatdes: concatdesLot
        }, () => {
          this.getDirections(concatLot, concatdesLot);
-         this.goBack();
+         this.travel();
        });
        console.log(concatLot);
        console.log(concatdesLot);
      }
-   }
+  }
+  else if (this.state.content == 'trails') {
+    if (this.state.chosenTrail)
+     {
+       let trailorig = this.state.trailLatOrig +","+this.state.trailLonOrig
+       let traildes = this.state.trailLatDes +","+this.state.trailLonDes
+       let trailway1 = this.state.trailLatWay1 +","+this.state.trailLonWay1
+       console.log(trailorig, traildes, trailway1);
+       this.getTrails(trailorig, traildes, trailway1);
+     }
+  }
+}
 
  // trailLot = () => {
  //     if (this.state.latitude != null && this.state.longitude!=null)
@@ -359,29 +447,29 @@ mergeLot = () => {
  //      }
  //    }
 
-  async getTrails(startLoc, destinationLoc) {
-      try {
-          let resp = await fetch(`https://maps.googleapis.com/maps/api/directions/json?origin=51.052368,-1.338736&destination=51.047661,-1.322166&waypoints=51.064042,-1.316191&key=AIzaSyALxSvI1eqDi0VooB6wRZGG0Du-T8doVnI&mode=walking`)
-          let respJson = await resp.json();
-          let points = Polyline.decode(respJson.routes[0].overview_polyline.points);
-          let coords = points.map((point, index) => {
-              return  {
-                  latitude : point[0],
-                  longitude : point[1]
-              }
-          })
-          this.focusHandler()
-          this.setState({coords: coords})
-          this.setState({x: "true"})
-          return coords
-          console.log(this.state.coords);
-
-      } catch(error) {
-         console.log(error);
-         this.setState({x: "error"})
-         return error
-      }
-  }
+  // async getTrails(startLoc, destinationLoc) {
+  //     try {
+  //         let resp = await fetch(`https://maps.googleapis.com/maps/api/directions/json?origin=51.052368,-1.338736&destination=51.047661,-1.322166&waypoints=51.064042,-1.316191&key=AIzaSyALxSvI1eqDi0VooB6wRZGG0Du-T8doVnI&mode=walking`)
+  //         let respJson = await resp.json();
+  //         let points = Polyline.decode(respJson.routes[0].overview_polyline.points);
+  //         let coords = points.map((point, index) => {
+  //             return  {
+  //                 latitude : point[0],
+  //                 longitude : point[1]
+  //             }
+  //         })
+  //         this.focusHandler()
+  //         this.setState({coords: coords})
+  //         this.setState({x: "true"})
+  //         return coords
+  //         console.log(this.state.coords);
+  //
+  //     } catch(error) {
+  //        console.log(error);
+  //        this.setState({x: "error"})
+  //        return error
+  //     }
+  // }
 
   renderHeader() {
     return (
@@ -606,7 +694,7 @@ mergeLot = () => {
   }
 
   renderTrails() {
-    const { locations, trails, selection, chosenLocation, tabFilter, content } = this.state;
+    const { locations, trails, selection, chosenLocation, chosenTrail, tabFilter, content } = this.state;
     if (!selection) {
       return (
         <View style={styles.trails}>
@@ -625,7 +713,7 @@ mergeLot = () => {
           <View>
             <View style={styles.trailTitleCon}>
 
-              <Trails content={content} locate={() => this.getTrails()}/>
+              <Trails list={trails} content={content} locate={() => this.getTrails()} handler={this.focusHandler} />
 
             </View>
           </View>
@@ -635,10 +723,7 @@ mergeLot = () => {
       else {
         return (
             <View style={styles.focusContainer}>
-              <Detail location={chosenLocation} handler={this.focusHandler} directions={this.mergeLot} nav={() => this.props.navigation.navigate('ARContent', {
-                location: chosenLocation.name,
-                otherParam: 'anything you want here',
-              })} />
+              <Detail handler={this.focusHandler} directions={this.mergeLot} location={chosenTrail} />
             </View>
         )
       }

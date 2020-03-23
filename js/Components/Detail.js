@@ -52,25 +52,17 @@ import { createStackNavigator } from '@react-navigation/stack';
              <Button title='X' onPress={detailItem.handler} />
            </View>
            <View>
-             {/* <View style={detailStyles.focusData}>
+             <View style={detailStyles.focusData}>
                <Text style={detailStyles.dataTitle}>{detailItem.location.name}</Text>
-               <Text>{detailItem.location.type}</Text>
                <View style={detailStyles.actions}>
                  <TouchableOpacity
-               style={detailStyles.directions}
-               onPress={() => detailItem.directions()}
+                   style={detailStyles.directions}
+                   onPress={() => detailItem.directions()}
                  >
-               <Text style={detailStyles.buttonTxt}>Directions</Text>
-                 </TouchableOpacity>
-                 <TouchableOpacity
-               style={detailStyles.ARButton}
-               onPress={() => detailItem.nav()}
-                 >
-               <Text style={detailStyles.buttonTxt}>Go to AR Content</Text>
+                   <Text style={detailStyles.buttonTxt}>Directions</Text>
                  </TouchableOpacity>
                </View>
-               <Text>{detailItem.location.description}</Text>
-             </View> */}
+             </View>
            </View>
          </View>
        );
